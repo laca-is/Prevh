@@ -14,7 +14,7 @@ setup(
     description='A data analysis library for data mining.',
     long_description=open('README.txt').read() + '\n\n' + open('CHANGELOG.txt').read(),
     url='',
-    author='Julio César Guimaraes Costa',
+    author='Júlio César Guimarães Costa',
     author_email='juliocesargcosta123@gmail.com',
     license='CC0-1.0 License',
     classifiers=classifiers,

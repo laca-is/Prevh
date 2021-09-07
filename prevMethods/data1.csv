@@ -1,9 +1,10 @@
+axis1,axis2,axis3,consequence,inforelev
 0.1,0.1,0.1,Choveu,1.0
 0.15,0.15,0.15,Choveu,1.0
 0.2,0.2,0.2,Choveu,1.0
-0.45,0.45,0.45,Nao Choveu,1.0
+1.45,0.45,0.45,Nao Choveu,1.0
 0.5,0.5,0.5,Nao Choveu,1.0
-0.55,0.55,0.55,Nao Choveu,1.0
+0.55,1.55,0.55,Nao Choveu,1.0
 0.8,0.8,0.8,Trovejou,1.0
 0.85,0.85,0.85,Trovejou,1.0
 0.9,0.9,0.9,Trovejou,1.0
