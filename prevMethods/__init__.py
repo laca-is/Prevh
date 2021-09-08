@@ -1,9 +1,8 @@
-# For Math and Information Uses
+# Libraries Imports
 import pandas as pd
 import numpy as np
 import math as mt
 from sklearn.preprocessing import MinMaxScaler
-# For Plot and Visualization Uses
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 import random as rd
@@ -63,36 +62,55 @@ class DataSetInfo:
 
     # Predict with raw data from DataSetInfo
     def predict(self, inputlist, **kwargs):
+
+        def Euclidean_Dist(df1, df2, cols=self.axisheader):
+            return np.linalg.norm(df1[cols].values - df2[cols].values, axis=1)
+
+        data = None
+        preinput = None
         predictresults = None
         nneighbors = kwargs.get('nNeighbors', self.datacount)
         # Input verifications
+        if isinstance(nneighbors, int):
+            nneighbors = np.full(shape=len(inputlist), fill_value=nneighbors).tolist()
         if not isinstance(inputlist, list):
-            raise TypeError("The input is not a list.")
-        for i in inputlist:
-            if len(i) != len(self.axisheader):
-                raise TypeError("At least one of the inputs does not match with axis length.")
+            raise TypeError("The prediction input parameter must be a list of lists.")
+        if not isinstance(nneighbors, list):
+            raise TypeError("The nNeighbors parameter must be a list.")
+        if len(nneighbors) != len(inputlist):
+            raise TypeError("The input and nNeighbors parameters must have the same length.")
         # Starts Prediction
-        for i in inputlist:
+        for e, i in enumerate(inputlist):
+            if not isinstance(i, list):
+                raise TypeError("The prediction input must be a list of lists.")
+            if len(i) != len(self.axisheader):
+                raise TypeError("At least one of the prediction inputs does not match with axis length.")
+            if nneighbors[e] > self.datacount or nneighbors[e] < 1 or not isinstance(nneighbors[e], int):
+                raise TypeError("The nNeighbors parameter must be an integer and be in between 1 and " + str(self.datacount) + " (inclusive).")
             predictdata = self.rawdata.copy()
-            i += [None, "0"]
-            predictdata.loc[len(predictdata)] = i
+            predictdata.loc[len(predictdata)] = i + [None, "0"]
             scaler = MinMaxScaler(feature_range=(0, 1))
             scaleddata = scaler.fit_transform(predictdata[self.axisheader])
             predictdata = pd.DataFrame(scaleddata, columns=self.axisheader)
             predictdata.insert(len(self.axisheader), self.resultsheader, self.rawdata[self.resultsheader], True)
             predictdata.insert(len(self.axisheader) + 1, self.relevationheader, self.rawdata[self.relevationheader], True)
-            normalizedinput = predictdata.loc[pd.isna(predictdata[self.resultsheader])]
-            normalizedinput = (normalizedinput.drop([self.resultsheader, self.relevationheader], axis=1)).reset_index(drop=True)
+            preinput = predictdata.loc[pd.isna(predictdata[self.resultsheader])]
+            preinput = (preinput.drop([self.resultsheader, self.relevationheader], axis=1)).reset_index(drop=True)
             predictdata = predictdata.loc[pd.notna(predictdata[self.resultsheader])]
-            print(normalizedinput)
+            data = predictdata.copy()
+            predictdata[self.relevationheader] = predictdata[self.relevationheader].apply(lambda x: x * mt.sqrt(len(self.axisheader)))
+            predictdata["distance"] = Euclidean_Dist(predictdata, preinput)
+            predictdata = predictdata.sort_values("distance").reset_index(drop=True)
+            predictdata = predictdata[predictdata.index < nneighbors[e]]
             print(predictdata)
-        return PredictInfo(inputlist, predictresults)
+        return PredictInfo(data, preinput, predictresults)
 
 
 class PredictInfo:
     # Self Creation Method
-    def __init__(self, normalizeddata, predictresults):
-        self.normalizeddata = normalizeddata  # pandas.DataFrame (object)
+    def __init__(self, useddata, usedinput, predictresults):
+        self.useddata = useddata  # pandas.DataFrame (object)
+        self.usedinput = usedinput  # pandas.DataFrame (object)
         self.predictresults = predictresults  # pandas.DataFrame (object)
 
 
@@ -122,8 +140,10 @@ def datasetfromDF(rawdata, **kwargs):  # (pd.DataFrame)
         datacount = rawdata.shape[0]
         resultsheader = rawdata.columns[colnum - 2]
         relevationheader = rawdata.columns[colnum - 1]
+        if lambda x: rawdata[relevationheader].between(-0.1, 1.1) is False:
+            raise TypeError("At least one of the information relevance is not between 0 and 1.")
     else:
-        raise TypeError("Please check if an DataFrame (Pandas) object.")
+        raise TypeError("Please check if the input is an DataFrame (Pandas) object.")
     return DataSetInfo(rawdata, axisheader, posibleresults, datacount, resultsheader, relevationheader)
 
 
@@ -159,8 +179,10 @@ def datasetfromCSV(path, div, **kwargs):  # (string, string)
     datacount = rawdata.shape[0]
     resultsheader = rawdata.columns[colnum - 2]
     relevationheader = rawdata.columns[colnum - 1]
+    if not rawdata[relevationheader].between(0, 1, inclusive=True).all():
+        raise TypeError("At least one of the information relevance is not between 0 and 1.")
     return DataSetInfo(rawdata, axisheader, posibleresults, datacount, resultsheader, relevationheader)
 
 
-prevhtest = datasetfromCSV("data1.csv", ",")
-prevhtest.predict([[0.1, 0.3, 0.4]])
+prevdata = datasetfromCSV("data1.csv", ",")
+prevresults = prevdata.predict([[0.1, 0.1, 0.1], [0.2, 0.4, 0.2]], nNeighbors=4)
