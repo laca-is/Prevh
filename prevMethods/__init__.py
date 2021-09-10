@@ -66,10 +66,11 @@ class DataSetInfo:
         def Euclidean_Dist(df1, df2, cols=self.axisheader):
             return np.linalg.norm(df1[cols].values - df2[cols].values, axis=1)
 
-        data = None
-        preinput = None
-        predictresults = None
+        predict_data = self.rawdata.copy()
+        list_of_predict_results = []
+        list_of_predict_inputs = []
         nneighbors = kwargs.get('nNeighbors', self.datacount)
+        predict_mode = kwargs.get('mode', "parallel")
         # Input verifications
         if isinstance(nneighbors, int):
             nneighbors = np.full(shape=len(inputlist), fill_value=nneighbors).tolist()
@@ -87,31 +88,40 @@ class DataSetInfo:
                 raise TypeError("At least one of the prediction inputs does not match with axis length.")
             if nneighbors[e] > self.datacount or nneighbors[e] < 1 or not isinstance(nneighbors[e], int):
                 raise TypeError("The nNeighbors parameter must be an integer and be in between 1 and " + str(self.datacount) + " (inclusive).")
-            predictdata = self.rawdata.copy()
-            predictdata.loc[len(predictdata)] = i + [None, "0"]
+            if predict_mode == "parallel": predict_data = self.rawdata.copy()
+            predict_results = pd.DataFrame(columns=[self.resultsheader, "probability", "relevance"])
+            predict_data.loc[len(predict_data)] = i + [None, "0"]
             scaler = MinMaxScaler(feature_range=(0, 1))
-            scaleddata = scaler.fit_transform(predictdata[self.axisheader])
-            predictdata = pd.DataFrame(scaleddata, columns=self.axisheader)
-            predictdata.insert(len(self.axisheader), self.resultsheader, self.rawdata[self.resultsheader], True)
-            predictdata.insert(len(self.axisheader) + 1, self.relevationheader, self.rawdata[self.relevationheader], True)
-            preinput = predictdata.loc[pd.isna(predictdata[self.resultsheader])]
-            preinput = (preinput.drop([self.resultsheader, self.relevationheader], axis=1)).reset_index(drop=True)
-            predictdata = predictdata.loc[pd.notna(predictdata[self.resultsheader])]
-            data = predictdata.copy()
-            predictdata[self.relevationheader] = predictdata[self.relevationheader].apply(lambda x: x * mt.sqrt(len(self.axisheader)))
-            predictdata["distance"] = Euclidean_Dist(predictdata, preinput)
-            predictdata = predictdata.sort_values("distance").reset_index(drop=True)
-            predictdata = predictdata[predictdata.index < nneighbors[e]]
-            print(predictdata)
-        return PredictInfo(data, preinput, predictresults)
+            scaleddata = scaler.fit_transform(predict_data[self.axisheader])
+            predict_data = pd.DataFrame(scaleddata, columns=self.axisheader)
+            predict_data.insert(len(self.axisheader), self.resultsheader, self.rawdata[self.resultsheader], True)
+            predict_data.insert(len(self.axisheader) + 1, self.relevationheader, self.rawdata[self.relevationheader], True)
+            predict_input = predict_data.loc[pd.isna(predict_data[self.resultsheader])]
+            predict_input = (predict_input.drop([self.resultsheader, self.relevationheader], axis=1)).reset_index(drop=True)
+            predict_data = predict_data.loc[pd.notna(predict_data[self.resultsheader])]
+            predict_data["distance"] = Euclidean_Dist(predict_data, predict_input)
+            predict_data = predict_data.sort_values("distance").reset_index(drop=True)
+            predict_data = predict_data[predict_data.index < nneighbors[e]]
+            predict_data[self.relevationheader] = predict_data[self.relevationheader].apply(lambda x: x * mt.sqrt(len(self.axisheader)))
+            predict_data["powered distance"] = predict_data.apply(lambda x: (x["distance"] * x[self.relevationheader]), axis=1)
+            powered_dist_sum = predict_data["powered distance"].sum()
+            for p, r in enumerate(self.posibleresults):
+                subset_df = predict_data[predict_data[self.resultsheader] == r]
+                column_sum = subset_df["powered distance"].sum()
+                if column_sum != 0:
+                    if column_sum != predict_data["powered distance"].sum():
+                        predict_results.loc[p] = [r, 1 - (column_sum/predict_data["powered distance"].sum()), mt.sqrt(len(self.axisheader)) * (1 - (column_sum/predict_data["powered distance"].sum()))]
+                    else:
+                        predict_results.loc[p] = [r, 1.0, mt.sqrt(len(self.axisheader))]
+            list_of_predict_results += [[predict_results, e]]
+        return PredictInfo(predict_data, list_of_predict_results)
 
 
 class PredictInfo:
     # Self Creation Method
-    def __init__(self, useddata, usedinput, predictresults):
-        self.useddata = useddata  # pandas.DataFrame (object)
-        self.usedinput = usedinput  # pandas.DataFrame (object)
-        self.predictresults = predictresults  # pandas.DataFrame (object)
+    def __init__(self, predict_data, predict_results):
+        self.predict_data = predict_data  # pandas.DataFrame (object)
+        self.predict_results = predict_results  # pandas.DataFrame (object)
 
 
 # FUNCTIONS
@@ -185,4 +195,6 @@ def datasetfromCSV(path, div, **kwargs):  # (string, string)
 
 
 prevdata = datasetfromCSV("data1.csv", ",")
-prevresults = prevdata.predict([[0.1, 0.1, 0.1], [0.2, 0.4, 0.2]], nNeighbors=4)
+prevresults = prevdata.predict([[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]], nNeighbors=[4, 9])
+print(prevresults.predict_data)
+print(*prevresults.predict_results, sep="\n")
