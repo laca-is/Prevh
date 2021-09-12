@@ -31,7 +31,7 @@ class DataSetInfo:
                 colors += [sc]
             return colors
 
-        title = kwargs.get('title', "Data Frame")
+        title = kwargs.get('title', "Data Set without normalization")
         colors = genrdhexcolor(len(self.posibleresults))
 
         if len(self.axisheader) == 2 or len(self.axisheader) == 3:
@@ -46,8 +46,6 @@ class DataSetInfo:
                             break
             else:
                 ax = fig.add_subplot(111)
-                ax.set_xlim(0, 1), ax.set_ylim(0, 1)
-                ax.set_xticks(ticks), ax.set_yticks(ticks)
                 for i in range(len(self.rawdata)):
                     for c, r in enumerate(self.posibleresults):
                         if r == self.rawdata.iat[i, 2]:
@@ -194,7 +192,8 @@ def datasetfromCSV(path, div, **kwargs):  # (string, string)
     return DataSetInfo(rawdata, axisheader, posibleresults, datacount, resultsheader, relevationheader)
 
 
-prevdata = datasetfromCSV("data1.csv", ",")
-prevresults = prevdata.predict([[0.5, 0.5, 0.5], [0.5, 0.5, 0.5]], nNeighbors=[4, 9])
+prevdata = datasetfromCSV("data2.csv", ",")
+prevresults = prevdata.predict([[0.1, 0.9]], nNeighbors=3)
 print(prevresults.predict_data)
 print(*prevresults.predict_results, sep="\n")
+prevdata.plot()
