@@ -18,7 +18,7 @@ setup(
     author_email='juliocesargcosta123@gmail.com',
     license='CC0-1.0 License',
     classifiers=classifiers,
-    keywords='Data analysis',
+    keywords='Data Mining',
     packages=find_packages(),
     install_requires=['numpy', 'pandas', 'matplotlib', 'random', 'sklearn']
 )

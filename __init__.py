@@ -190,10 +190,3 @@ def datasetfromCSV(path, div, **kwargs):  # (string, string)
     if not rawdata[relevationheader].between(0, 1, inclusive=True).all():
         raise TypeError("At least one of the information relevance is not between 0 and 1.")
     return DataSetInfo(rawdata, axisheader, posibleresults, datacount, resultsheader, relevationheader)
-
-
-prevdata = datasetfromCSV("data2.csv", ",")
-prevresults = prevdata.predict([[0.1, 0.9]], nNeighbors=3)
-print(prevresults.predict_data)
-print(*prevresults.predict_results, sep="\n")
-prevdata.plot()
