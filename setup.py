@@ -20,5 +20,5 @@ setup(
     classifiers=classifiers,
     keywords='Data Mining',
     packages=find_packages(),
-    install_requires=['numpy', 'pandas', 'matplotlib', 'random', 'sklearn']
+    install_requires=['numpy', 'pandas', 'matplotlib', 'scikit-learn']
 )
