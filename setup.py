@@ -4,21 +4,22 @@ classifiers = [
     'Development Status :: 3 - Alpha',
     'Intended Audience :: Developers',
     'Operating System :: Microsoft :: Windows :: Windows 10',
-    'License :: OSI Approved :: MIT License',
+    'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
     'Programming Language :: Python :: 3.8'
 ]
 
 setup(
-    name='prevh',
-    version='0.0.1',
+    name='prevhlib',
+    version='0.0.3',
     description='A data analysis library for data mining.',
     long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.txt').read(),
-    url='',
+    long_description_content_type="text/markdown",
+    url='https://github.com/JCGCosta',
     author='Júlio César Guimarães Costa',
     author_email='juliocesargcosta123@gmail.com',
-    license='MIT License',
+    license='GNU General Public License v3 (GPLv3)',
     classifiers=classifiers,
-    keywords='Data Mining',
+    keywords='DataMining',
     py_modules=["prevh"],
     package_dir={'': 'src'},
     packages=find_packages(),
