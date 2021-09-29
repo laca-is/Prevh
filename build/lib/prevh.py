@@ -131,12 +131,11 @@ def datasetfromDF(rawdata, **kwargs):  # (pd.DataFrame)
         if header != "FromFile":
             if isinstance(header, list):
                 try:
-                    header += ["Consequence", "Relevance"]
+                    header += ["Result", "Relevance"]
                     rawdata.columns = header
                 except TypeError("Please verify if the header values match with the number of columns."):
                     return None
             else:
-                rawdata = pd.read_csv(path, div, header=None)
                 col = []
                 for it in range(len(rawdata.columns)):
                     col += ["a" + str(it + 1)]
@@ -148,7 +147,7 @@ def datasetfromDF(rawdata, **kwargs):  # (pd.DataFrame)
         datacount = rawdata.shape[0]
         resultsheader = rawdata.columns[colnum - 2]
         relevationheader = rawdata.columns[colnum - 1]
-        if lambda x: rawdata[relevationheader].between(-0.1, 1.1) is False:
+        if not rawdata[relevationheader].between(0, 1, inclusive="both").all():
             raise TypeError("At least one of the information relevance is not between 0 and 1.")
     else:
         raise TypeError("Please check if the input is an DataFrame (Pandas) object.")
@@ -162,17 +161,14 @@ def datasetfromCSV(path, div, **kwargs):  # (string, string)
     header = kwargs.get('header', "FromFile")
     # header configuration
     try:
-        if header == "FromFile":
-            rawdata = pd.read_csv(path, div)
-        elif isinstance(header, list):
+        rawdata = pd.read_csv(path, sep=div)
+        if isinstance(header, list):
             try:
-                rawdata = pd.read_csv(path, div, header=None)
                 header += ["Result", "Relevance"]
                 rawdata.columns = header
             except TypeError("Please verify if the header values match with the number of columns."):
                 return None
-        else:
-            rawdata = pd.read_csv(path, div, header=None)
+        elif header != "FromFile":
             col = []
             for it in range(len(rawdata.columns)):
                 col += ["a" + str(it + 1)]
@@ -187,6 +183,6 @@ def datasetfromCSV(path, div, **kwargs):  # (string, string)
     datacount = rawdata.shape[0]
     resultsheader = rawdata.columns[colnum - 2]
     relevationheader = rawdata.columns[colnum - 1]
-    if not rawdata[relevationheader].between(0, 1, inclusive=True).all():
+    if not rawdata[relevationheader].between(0, 1, inclusive="both").all():
         raise TypeError("At least one of the information relevance is not between 0 and 1.")
     return DataSetInfo(rawdata, axisheader, posibleresults, datacount, resultsheader, relevationheader)

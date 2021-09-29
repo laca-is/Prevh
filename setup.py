@@ -10,7 +10,7 @@ classifiers = [
 
 setup(
     name='prevhlib',
-    version='0.0.4',
+    version='0.0.5',
     description='A data analysis library for data mining.',
     long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.txt').read(),
     long_description_content_type="text/markdown",

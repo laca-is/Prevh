@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: prevhlib
-Version: 0.0.4
+Version: 0.0.5
 Summary: A data analysis library for data mining.
 Home-page: https://github.com/JCGCosta
 Author: Júlio César Guimarães Costa
@@ -48,7 +48,7 @@ Description: # Prevh
         Change Log
         ===============
         
-        0.0.4 (29/09/2021)
+        0.0.5 (29/09/2021)
         ------------------
         - First Release
 Keywords: DataMining
