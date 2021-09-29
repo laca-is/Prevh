@@ -34,5 +34,5 @@ predictions = dataset.predict([[11, 11, 11], [32, 32, 32], [91, 91, 91]], kNeigh
 # to see how the normalization was made in the data set (Output = pandas.DataFrame)
 print(predictions.predict_data)
 # to see the prediction results (Output = list)
-print(predictions.predict_data)
+print(predictions.predict_results)
 ```
