@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: prevhlib
-Version: 0.0.3
+Version: 0.0.4
 Summary: A data analysis library for data mining.
 Home-page: https://github.com/JCGCosta
 Author: Júlio César Guimarães Costa
@@ -42,13 +42,13 @@ Description: # Prevh
         # to see how the normalization was made in the data set (Output = pandas.DataFrame)
         print(predictions.predict_data)
         # to see the prediction results (Output = list)
-        print(predictions.predict_data)
+        print(predictions.predict_results)
         ```
         
         Change Log
         ===============
         
-        0.0.3 (29/09/2021)
+        0.0.4 (29/09/2021)
         ------------------
         - First Release
 Keywords: DataMining
