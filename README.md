@@ -11,16 +11,16 @@ Installing with pip: pip install prevhlib
 ## Dataset File sample
 
 ```text
-axis1,axis2,axis3,result,relevance
-10,10,10,Azul,1.0
-15,15,15,Azul,1.0
-20,20,20,Azul,1.0
-45,45,45,Verde,1.0
-50,50,50,Verde,1.0
-55,55,55,Verde,1.0
-80,80,80,Vermelho,1.0
-85,85,85,Vermelho,1.0
-90,90,90,Vermelho,1.0
+axis1,axis2,axis3,cluster,relevance
+10,10,10,Blue,1.0
+15,15,15,Blue,1.0
+20,20,20,Blue,1.0
+45,45,45,Green,1.0
+50,50,50,Green,1.0
+55,55,55,Green,1.0
+80,80,80,Red,1.0
+85,85,85,Red,1.0
+90,90,90,Red,1.0
 ```
 
 ## Python sample:

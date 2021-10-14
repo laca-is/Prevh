@@ -10,11 +10,11 @@ classifiers = [
 
 setup(
     name='prevhlib',
-    version='0.0.5',
+    version='0.0.6',
     description='A data analysis library for data mining.',
     long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.txt').read(),
     long_description_content_type="text/markdown",
-    url='https://github.com/JCGCosta',
+    url='https://github.com/JCGCosta/Prevh',
     author='Júlio César Guimarães Costa',
     author_email='juliocesargcosta123@gmail.com',
     license='GNU General Public License v3 (GPLv3)',
