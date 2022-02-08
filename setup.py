@@ -21,7 +21,7 @@ setup(
     classifiers=classifiers,
     keywords='DataMining',
     py_modules=["prevh"],
-    package_dir={'': 'src'},
+    package_dir={'': 'prevh'},
     packages=find_packages(),
     install_requires=['numpy', 'pandas', 'matplotlib', 'scikit-learn']
 )
