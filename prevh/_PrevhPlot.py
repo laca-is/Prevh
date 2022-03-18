@@ -3,7 +3,7 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 import random as rd
-from ._PrevhClassifier import PrevhClassifier
+from ._PrevhClassifierLegacy import PrevhClassifier
 
 class PrevhPlot(PrevhClassifier):
 

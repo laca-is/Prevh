@@ -17,6 +17,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\prevh\processedClevelandCSV.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\prevh\trainingdata.csv">
           <value>
             <Attribute>
