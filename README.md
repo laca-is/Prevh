@@ -28,7 +28,7 @@ axis1,axis2,axis3,cluster,relevance
 ```python
 import prevh as ph
 # create the dataset
-dataset = ph.datasetfromCSV("C:/trainingdata.csv", ",")
+dataset = ph.datasetfromCSV("C:/dataWithRelevance.csv", ",")
 # executes the prediction for the follow information
 predictions = dataset.predict([[11, 11, 11], [32, 32, 32], [91, 91, 91]], kNeighbors=6)
 # to see how the normalization was made in the data set (Output = pandas.DataFrame)

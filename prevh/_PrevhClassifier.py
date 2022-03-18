@@ -7,30 +7,31 @@ from sklearn.preprocessing import MinMaxScaler
 
 class PrevhClassifier:
 
-    def __init__(self, df_dataset):
+    def __init__(self, df_dataset, **kwargs): # classifier initialization
+        # train test verifications
         if not type(df_dataset) is pd.core.frame.DataFrame:
             raise TypeError("First argument must be a Pandas DataFrame object.")
+        if not df_dataset[df_dataset.columns[len(df_dataset.columns) - 1]].between(0, 1, inclusive="both").all():
+            raise TypeError("At least one of the information relevance is not between 0 and 1.")
+        # classifier creation method
         self.rawdata = df_dataset
+        self.spacedelimitationmethod = kwargs.get('delimitationMethod', "KNN")
         self.axisheader = df_dataset.columns[:len(df_dataset.columns) - 2]
         self.posibleresults = df_dataset.iloc[:, len(df_dataset.columns) - 2].unique()
         self.datacount = df_dataset.shape[0]
         self.resultsheader = df_dataset.columns[len(df_dataset.columns) - 2]
         self.relevationheader = df_dataset.columns[len(df_dataset.columns) - 1]
-        if not df_dataset[df_dataset.columns[len(df_dataset.columns) - 1]].between(0, 1, inclusive="both").all():
-            raise TypeError("At least one of the information relevance is not between 0 and 1.")
 
-    # Predict with raw data from DataSetInfo
-    def predict_pertinence(self, inputlist, **kwargs):
 
-        # Euclidean distance function
+    def predict_pertinence(self, inputlist, **kwargs): # classifier pertinence prediction
+        # n-dimensional euclidean distance function
         def Euclidean_Dist(df1, df2, cols=self.axisheader):
             return np.linalg.norm(df1[cols].values - df2[cols].values, axis=1)
 
         # Kwargs default definitions and return list creation
         list_of_predict_results = []
         nneighbors = kwargs.get('k', self.datacount)
-        predict_mode = kwargs.get('mode', "nearestNeighbors")
-        # First input verifications
+        # test set verifications
         if isinstance(nneighbors, int):
             nneighbors = np.full(shape=len(inputlist), fill_value=nneighbors).tolist()
         if not isinstance(inputlist, list):
@@ -41,7 +42,7 @@ class PrevhClassifier:
             raise TypeError("The input and nNeighbors parameters must have the same length.")
         # Starts Prediction
         for e, i in enumerate(inputlist):
-            # Second input verifications
+            # test set verifications
             if not isinstance(i, list):
                 raise TypeError("The prediction input must be a list of lists.")
             if len(i) != len(self.axisheader):
@@ -59,9 +60,12 @@ class PrevhClassifier:
             predict_input = predict_data.loc[pd.isna(predict_data[self.resultsheader])]
             predict_input = (predict_input.drop([self.resultsheader, self.relevationheader], axis=1)).reset_index(drop=True)
             predict_data = predict_data.loc[pd.notna(predict_data[self.resultsheader])]
+            print(predict_data)
+            print(predict_input)
             predict_data["distance"] = Euclidean_Dist(predict_data, predict_input)
             predict_data = predict_data.sort_values("distance").reset_index(drop=True)
-            if predict_mode == "nearestNeighbors": predict_data = predict_data[predict_data.index < nneighbors[e]]
+            if self.spacedelimitationmethod == "KNN": predict_data = predict_data[predict_data.index < nneighbors[e]]
+            #if self.spacedelimitationmethod == "KNR": #PROGRAMAR KNR E TESTAR
             predict_data[self.relevationheader] = predict_data[self.relevationheader].apply(lambda x: x * mt.sqrt(len(self.axisheader)))
             predict_data["powered distance"] = predict_data.apply(lambda x: (x["distance"] * x[self.relevationheader]), axis=1)
             powered_dist_sum = predict_data["powered distance"].sum()
@@ -72,3 +76,5 @@ class PrevhClassifier:
                     predict_results.loc[p] = [r, 1 - (column_sum/predict_data["powered distance"].sum()), mt.sqrt(len(self.axisheader)) * (1 - (column_sum/predict_data["powered distance"].sum()))]
             list_of_predict_results += [[predict_results, e]]
         return list_of_predict_results
+
+PrevhClassifier(pd.read_csv("dataWithRelevance.csv", ",")).predict_pertinence([[10, 10, 10], [20, 20, 20]], k=6)
