@@ -11,7 +11,10 @@ def prepareData(rawData, containsRelevance, *args):
     normalizedData, normalizedInput = [], []
     rawData.dropna(axis=0)  # cleaning dirty data into the training set before normalization
     if len(args) == 1:
-        rawData.append(args[0] + [np.NaN, "0"])
+        if containsRelevance: newRow = args[0] + [np.NaN, 0.0]
+        else: newRow = args[0] + [np.NaN]
+        newRow = pd.Series(newRow, index=rawData.columns)
+        rawData = rawData.append(newRow, ignore_index=True)
     if containsRelevance:
         normalizedData = pd.DataFrame(MinMaxScaler(feature_range=(0, 1)).fit_transform(rawData[rawData.columns[:len(rawData.columns) - 2]]), columns=rawData.columns[:len(rawData.columns) - 2])
         normalizedData.insert(len(rawData.columns[:len(rawData.columns) - 2]), "label", rawData["label"], True)  # adding the label column to the normalizedData
@@ -21,7 +24,6 @@ def prepareData(rawData, containsRelevance, *args):
         except: raise TypeError("Probably your data set does not contains relevance column.")
         normalizedData.insert(len(rawData.columns[:len(rawData.columns) - 1]), "label", rawData["label"], True)  # adding the label column to the normalizedData
     if len(args) == 1:
-        print(normalizedData)
         normalizedInput = normalizedData.tail(1)
         normalizedData = normalizedData.dropna(axis=0)
         return normalizedData, normalizedInput
@@ -72,6 +74,9 @@ class PrevhClassifier:
             raise TypeError("There are too many arguments. (Please verify the documentation file)")
         if algorithm not in algorithms:
             raise TypeError("The algorithm chosen is not supported. (Please verify the documentation file)")
+        for lab in self.labels:
+            if k > self.normalizedData["label"].value_counts()[lab]:
+                raise TypeError("Does not exist enough values for {} using K = {}.".format(lab, k))
         # FUNCTION BEGIN
         if len(args) == 1: # Used for a simple predict
             train_set, unclassified_data = prepareData(self.rawData, self.containsRelevance, args[0])
@@ -87,8 +92,6 @@ class PrevhClassifier:
             train_set_aux = pd.DataFrame(columns=self.normalizedData.columns)
             train_set = train_set.sort_values("label")
             for label in self.labels:
-                if k > train_set["label"].value_counts()[label]:
-                    raise TypeError("Does not exist enough values for {} using K = {}.".format(label, k))
                 train_set_aux = train_set_aux.append(train_set.head(k))
                 train_set = train_set[train_set.label != label]
             train_set = train_set_aux
@@ -107,7 +110,7 @@ class PrevhClassifier:
         # CONSTANTS
         scoreMethods = ["TrainTestSplit", "KFold"]  # possible score methods
         algorithms = ["KNN", "KNR"]  # possible space delimitation algorithms
-        if self.usingRelevance: labelIndex = -2
+        if self.containsRelevance: labelIndex = -2
         else: labelIndex = -1
         # FUNCTION GLOBAL VARIABLES
         score = 0
@@ -144,10 +147,8 @@ class PrevhClassifier:
             score = sum(foldScore) / n_splits
         return score
 
-prevhclass1 = PrevhClassifier(pd.read_csv("dataWithRelevance.csv", ","), containsRelevance=True)
-print(prevhclass1.predict([50,50,50], algorithm="KNR", k=2))
-
-prevhclass2 = PrevhClassifier(pd.read_csv("dataWithoutRelevance.csv",","))
-print(prevhclass2.predict([50,50,50], algorithm="KNN", k=2))
-
-#scoreTest = prevhclass.calculateScore("TrainTestSplit", k=4, n_splits=3)
+prevhclass = PrevhClassifier(pd.read_csv("dataWithoutRelevance.csv",","))
+KfoldScore = prevhclass.calculateScore("KFold", algorithm="KNR", k=3, n_splits=3, seed=10)
+TrainTestSplitScore = prevhclass.calculateScore("TrainTestSplit", algorithm="KNR", k=3, n_splits=3, seed=10)
+print("TrainTestSplit:", TrainTestSplitScore)
+print("KFold:", KfoldScore)
