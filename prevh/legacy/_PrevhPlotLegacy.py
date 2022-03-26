@@ -1,9 +1,8 @@
 """Prevh DataSet Plot"""
 
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import axes3d
 import random as rd
-from ._PrevhClassifierLegacy import PrevhClassifier
+from prevh.legacy._PrevhClassifierLegacy import PrevhClassifier
 
 class PrevhPlot(PrevhClassifier):
 

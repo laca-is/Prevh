@@ -1,17 +1,23 @@
 # Prevh
-This is a python data mining library. 
+This package implements the Prevh classification algorithm.
+> The algorithm is based in the follow [research](https://zenodo.org/record/6090322#.Yj98bKbMKUk) **Pages 71-76**.
+ 
+> [Package Documentation](https://pypi.org/project/prevhlib/).
 
-# Installing
-Package Documentation: https://pypi.org/project/prevhlib/
+# User Guide
 
-Installing with pip: pip install prevhlib
+###This package can be installed with the following command: **pip install prevhlib**
 
-# Usage
+## Dataset
+***The file must be a CSV file and the header must be included.***
 
-## Dataset File sample
+The columns must be in the following order:
+* The features columns;
+* The label column;
+* The relevance column (Optional).
 
 ```text
-axis1,axis2,axis3,cluster,relevance
+feature1,feature2,feature3,label,relevance
 10,10,10,Blue,1.0
 15,15,15,Blue,1.0
 20,20,20,Blue,1.0
@@ -23,16 +29,20 @@ axis1,axis2,axis3,cluster,relevance
 90,90,90,Red,1.0
 ```
 
-## Python sample:
+## Python example:
 
 ```python
 import prevh as ph
-# create the dataset
-dataset = ph.datasetfromCSV("C:/dataWithRelevance.csv", ",")
-# executes the prediction for the follow information
-predictions = dataset.predict([[11, 11, 11], [32, 32, 32], [91, 91, 91]], kNeighbors=6)
-# to see how the normalization was made in the data set (Output = pandas.DataFrame)
-print(predictions.predict_data)
-# to see the prediction results (Output = list)
-print(predictions.predict_results)
+import pandas as pd
+# Creates the classifier
+prevhClass = PrevhClassifier(pd.read_csv("irisDataCSV.csv",","))
+# Label recurrence in the dataset (Important to use KNR method)
+print(prevhClass.labelCount)
+# Rows count in the dataset (Important to use KNN method)
+print(prevhClass.rowsCount)
+# Calculate the dataset score using the TrainTestSplit and KFold Cross-Validation methods
+TrainTestSplitScore = prevhclass.calculateScore("TrainTestSplit", algorithm="KNN", k=4, train_size=0.8, seed=42)
+KfoldScore = prevhclass.calculateScore("KFold", algorithm="KNR", k=35, n_splits=15, seed=42)
+print("TrainTestSplitScore:", TrainTestSplitScore)
+print("KFoldScore:", KfoldScore)
 ```

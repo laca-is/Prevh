@@ -10,8 +10,8 @@ classifiers = [
 
 setup(
     name='prevhlib',
-    version='0.0.6',
-    description='A data analysis library for data mining.',
+    version='0.0.7',
+    description='Data Mining package implementing the PrevhClassifier algorithm.',
     long_description=open('README.md').read() + '\n\n' + open('CHANGELOG.txt').read(),
     long_description_content_type="text/markdown",
     url='https://github.com/JCGCosta/Prevh',

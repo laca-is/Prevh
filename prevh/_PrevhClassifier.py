@@ -154,12 +154,6 @@ class PrevhClassifier:
             score = sum(foldScore) / n_splits
         return score
 
-prevhclass = PrevhClassifier(pd.read_csv("irisDataCSV.csv",","))
-TrainTestSplitScore = prevhclass.calculateScore("TrainTestSplit", algorithm="KNN", k=4, train_size=0.8, seed=42)
-print("TrainTestSplitScore:", TrainTestSplitScore)
-KfoldScore = prevhclass.calculateScore("KFold", algorithm="KNR", k=35, n_splits=15, seed=42)
-print("KFoldScore:", KfoldScore)
-
 # Some interesting results:
 # Database - (scoreAlgorithm, spaceDelimitationMethod, k, train_size(TrainTestSplit)/n_splits(Kfold), randomnessSeed) => correct predict percentage
 # IrisDataCSV - ("TrainTestSplit", algorithm="KNN", k=4, train_size=0.8, seed=42) => 0.966

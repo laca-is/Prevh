@@ -77,4 +77,4 @@ class PrevhClassifier:
             list_of_predict_results += [[predict_results, e]]
         return list_of_predict_results
 
-PrevhClassifier(pd.read_csv("dataWithRelevance.csv", ",")).predict_pertinence([[10, 10, 10], [20, 20, 20]], k=6)
+PrevhClassifier(pd.read_csv("../dataWithRelevance.csv", ",")).predict_pertinence([[10, 10, 10], [20, 20, 20]], k=6)
