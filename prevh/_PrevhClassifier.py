@@ -34,7 +34,7 @@ class PrevhClassifier:
     def __init__(self, data, **kwargs): # classifier initialization
         # KWARGS
         containsRelevance = kwargs.get("containsRelevance", False)
-        # PARAMETERS ERROR TREATMENT
+        # ERROR HANDLING IN PARAMETERS
         if not type(data) is pd.core.frame.DataFrame:
             raise TypeError("The training dataset must be a Pandas DataFrame object.")
         try:
@@ -69,7 +69,7 @@ class PrevhClassifier:
         # KWARGS
         k = kwargs.get("k", self.rowsCount)
         algorithm = kwargs.get("algorithm", "KNR")
-        # PARAMETERS ERROR TREATMENT
+        # ERROR HANDLING IN PARAMETERS
         if len(args) > 2:
             raise TypeError("There are too many arguments. (Please verify the documentation file)")
         if algorithm not in algorithms:
@@ -118,7 +118,7 @@ class PrevhClassifier:
         algorithm = kwargs.get("algorithm", "KNR")
         if self.containsRelevance: labelIndex = -2
         else: labelIndex = -1
-        # PARAMETERS ERROR TREATMENT
+        # ERROR HANDLING IN PARAMETERS
         if scoreMethod not in scoreMethods:
             raise TypeError("The scoreMethod chosen is not supported. (Please verify the documentation file)")
         if algorithm not in algorithms:
@@ -154,8 +154,14 @@ class PrevhClassifier:
             score = sum(foldScore) / n_splits
         return score
 
-prevhclass = PrevhClassifier(pd.read_csv("processedClevelandCSV.csv",","))
-KfoldScore = prevhclass.calculateScore("KFold", algorithm="KNR", k=1, n_splits=10, seed=None)
-TrainTestSplitScore = prevhclass.calculateScore("TrainTestSplit", algorithm="KNR", k=1, train_size=0.6, seed=None)
+prevhclass = PrevhClassifier(pd.read_csv("irisDataCSV.csv",","))
+TrainTestSplitScore = prevhclass.calculateScore("TrainTestSplit", algorithm="KNN", k=4, train_size=0.8, seed=42)
 print("TrainTestSplitScore:", TrainTestSplitScore)
+KfoldScore = prevhclass.calculateScore("KFold", algorithm="KNR", k=35, n_splits=15, seed=42)
 print("KFoldScore:", KfoldScore)
+
+# Some interesting results:
+# Database - (scoreAlgorithm, spaceDelimitationMethod, k, train_size(TrainTestSplit)/n_splits(Kfold), randomnessSeed) => correct predict percentage
+# IrisDataCSV - ("TrainTestSplit", algorithm="KNN", k=4, train_size=0.8, seed=42) => 0.966
+# IrisDataCSV - ("TrainTestSplit", algorithm="KNR", k=25, train_size=0.8, seed=42) => 0.966
+# IrisDataCSV - ("KFold", algorithm="KNR", k=40, n_splits=10, seed=42) => 0.946
